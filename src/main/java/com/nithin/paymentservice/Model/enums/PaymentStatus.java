@@ -1,4 +1,5 @@
 package com.nithin.paymentservice.Model.enums;
 
-public class PaymentStatus {
+public enum PaymentStatus {
+    SUCCESSFUL, FAILED, REFUND, RECONCILIATION, PENDING
 }
