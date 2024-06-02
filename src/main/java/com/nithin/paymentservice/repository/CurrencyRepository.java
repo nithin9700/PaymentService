@@ -10,4 +10,5 @@ import java.util.UUID;
 
 @Repository
 public interface CurrencyRepository extends JpaRepository<Currency, UUID> {
+
 }

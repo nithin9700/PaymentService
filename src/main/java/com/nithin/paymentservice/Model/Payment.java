@@ -23,5 +23,4 @@ public class Payment extends BaseModel{
     private UUID userId;
     @Enumerated(EnumType.ORDINAL)
     private PaymentStatus paymentStatus;
-
 }
