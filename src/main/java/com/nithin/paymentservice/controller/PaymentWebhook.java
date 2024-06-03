@@ -1,40 +1,38 @@
 package com.nithin.paymentservice.controller;
 
 
-import com.nithin.paymentservice.service.PaymentService;
+import com.nithin.paymentservice.Model.enums.PaymentStatus;
 import com.nithin.paymentservice.service.WebhookPayment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-import java.util.UUID;
 
 @RestController
 public class PaymentWebhook {
     @Autowired
     private WebhookPayment webhookPayment;
 
-    @PostMapping("/webhook")
-    public ResponseEntity<?> handleWebhookEvent(@RequestBody Map<String, Object> payload) {
-        // Extract relevant data from the webhook payload
-        UUID paymentId = (UUID) payload.get("payment_id");
-        String status = (String) payload.get("status");
-        // Extract other relevant data as needed
+    @GetMapping("/webhook")
+    public ResponseEntity<?> handleWebhookEvent(@RequestParam(value = "razorpay_payment_id", required = false) String razorpayPaymentId,
+                                                @RequestParam(value = "razorpay_payment_link_reference_id", required = false) String razorpayPaymentLinkReferenceId,
+                                                @RequestParam(value = "razorpay_payment_link_status", required = false) String razorpayPaymentLinkStatus){
+        PaymentStatus paymentStatus = webhookPayment.updatePaymentStatus(razorpayPaymentId,
+                razorpayPaymentLinkReferenceId,
+                razorpayPaymentLinkStatus);
 
-        if ("successful".equals(status)) {
-            // Update database if payment is successful
-            try {
-                webhookPayment.updatePaymentStatus(paymentId, "SUCCESS");
-
-                return ResponseEntity.ok("Payment updated successfully");
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating payment");
-            }
-        } else {
-            // Handle other payment statuses if needed
-            return ResponseEntity.ok("Payment status: " + status);
-        }
+        return new ResponseEntity<>(paymentStatus, HttpStatus.OK);
     }
 }
+
+
+
+/*
+https://c722-183-83-129-211.ngrok-free.app/webhook?
+razorpay_payment_id=pay_OIM0Z8xr39fd8m
+razorpay_payment_link_id=plink_OIM0LI0FmbNSV5
+razorpay_payment_link_reference_id=
+razorpay_payment_link_status=paid
+razorpay_signature=55d8d6775c8283c184caa7e136cfa5e6378c0419b8e07272b17ed2b606ce39f6
+ */
